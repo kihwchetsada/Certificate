@@ -19,7 +19,7 @@
 
 ```bash
 # Clone โปรเจค
-git clone [URL_repository]
+git clone [URL_repository](https://github.com/kihwchetsada/Certificate.git)
 
 # ติดตั้ง Dependencies
 composer install
