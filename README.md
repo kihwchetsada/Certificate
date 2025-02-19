@@ -10,7 +10,7 @@
 
 1. ดาวน์โหลดหรือ Clone โปรเจค
 ```bash
-git clone [URL_repository]
+git clone [URL_repository](https://github.com/kihwchetsada/Certificate.git)
 cd [ชื่อโฟลเดอร์]
 ```
 
