@@ -80,7 +80,7 @@ $hasData = !empty($participants);
                                     <td><?= ($offset + $index + 1) ?></td>
                                     <td><?= htmlspecialchars($row['name']) ?></td>
                                     <td><?= htmlspecialchars($row['detail']) ?></td>
-                                    <td><?= htmlspecialchars($row['date']) ?></td>
+                                    <td><?= htmlspecialchars($row['datenew']) ?></td>
                                     <td><?= htmlspecialchars($row['model']) ?></td> 
                                     <td>
                                         <a href="backend-edit.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">✏️ แก้ไข</a>

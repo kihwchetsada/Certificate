@@ -1,10 +1,10 @@
 <?php
 require('database.php');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = trim($_POST['name']);
-    $detail = trim($_POST['detail']);
-    // $date = $_POST['date']; // คงการ comment ไว้
+if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = trim($_POST['name'] ?? '');
+    $detail = trim($_POST['detail'] ?? '');
+    $date = $_POST['datenew'] ?? date('d-m-Y'); 
     $model = $_POST['model'] ?? 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา';
 
     if (!empty($name) && !empty($detail) && !empty($model)) {
@@ -18,8 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     window.location.href = 'backend-index.php';
                   </script>";
         } else {
-            $stmt = $pdo->prepare("INSERT INTO participants (name, detail, model) VALUES (?, ?, ?)");
-            if ($stmt->execute([$name, $detail, $model])) {
+            $stmt = $pdo->prepare("INSERT INTO participants (name, detail, datenew, model) VALUES (?, ?, ?, ?)");
+            
+            if ($stmt->execute([$name, $detail, $date, $model])) {
                 echo "<script>
                         alert('✅ ลงทะเบียนสำเร็จ');
                         window.location.href = 'backend-index.php';
@@ -31,5 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "<script>alert('❌ กรุณากรอกข้อมูลให้ครบถ้วน');</script>";
     }
+} else {
+    echo "<script>alert('❌ ไม่รองรับการเข้าถึงหน้านี้โดยตรง');</script>";
 }
 ?>

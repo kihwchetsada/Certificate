@@ -32,7 +32,7 @@
             </div>
             <div class="mb-4">
                 <label class="form-label"> วันที่เข้าร่วม</label>
-                <input type="date" name="date" class="form-control" required>
+                <input type="date" name="datenew" class="form-control" required>
             </div>
             <div class="mb-4">
                 <label class="form-label">เลือกรุ่นของเกียรติบัตร</label>

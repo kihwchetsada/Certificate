@@ -19,10 +19,10 @@ $success = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $detail = $_POST['detail'];
-    $date = $_POST['date'];
+    $date = $_POST['datenew'];
     $model = $_POST['model']; 
 
-    $stmt = $pdo->prepare("UPDATE participants SET name=?, detail=?, date=?, model=? WHERE id=?");
+    $stmt = $pdo->prepare("UPDATE participants SET name=?, detail=?, datenew=?, model=? WHERE id=?");
     if ($stmt->execute([$name, $detail, $date, $model, $id])) {
         $success = true;
     }
@@ -50,13 +50,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">รายละเอียด</label>
-                    <input type="text" name="detail" class="form-control" placeholder="กรอกรายละเอียด" value="<?= htmlspecialchars($participant['detail']) ?>" required>
+                <label class="form-label">หัวข้อเกียรติบัตร</label>
+                <select name="certificate_type" class="form-control" required>
+                    <option value="" disabled selected>กรุณาเลือกหัวข้อเกียรติบัตร</option>
+                    <option value="รางวัลชนะเลิศ" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลชนะเลิศ' ? 'selected' : '' ?>>รางวัลชนะเลิศ</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 1' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 1</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 2' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 2</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 3' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 3</option>
+                    <option value="ผู้เข้าร่วมการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้เข้าร่วมการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมการแข่งขัน</option>
+                    <option value="ผู้ควบคุมทีม" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้ควบคุมทีม' ? 'selected' : '' ?>>ผู้ควบคุมทีม</option>
+                    <option value="กรรมการจัดการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'กรรมการจัดการแข่งขัน' ? 'selected' : '' ?>>กรรมการจัดการแข่งขัน</option>
+                    <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
+                </select>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">วันที่</label>
-                    <input type="date" name="date" class="form-control" value="<?= htmlspecialchars($participant['date']) ?>" required>
+                    <input type="date" name="datenew" class="form-control" value="<?= htmlspecialchars($participant['datenew']) ?>" required>
                 </div>
 
                 <div class="mb-3">
