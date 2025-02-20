@@ -48,7 +48,7 @@ DB_NAME=certificate_db
 📦 certificate-system
  ┣ 📂 assets/
  ┃ ┣ 📂 fonts/
- ┃ ┣ 📂 templates/
+ ┃ ┣ 📜 templates.jpg
  ┃ ┗ 📂 css/
  ┣ 📂 certificates/
  ┣ 📂 vendor/
