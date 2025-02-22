@@ -51,16 +51,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="mb-3">
                 <label class="form-label">หัวข้อเกียรติบัตร</label>
-                <select name="certificate_type" class="form-control" required>
+                <select name="detail" class="form-control" required>
                     <option value="" disabled selected>กรุณาเลือกหัวข้อเกียรติบัตร</option>
-                    <option value="รางวัลชนะเลิศ" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลชนะเลิศ' ? 'selected' : '' ?>>รางวัลชนะเลิศ</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 1' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 1</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 2' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 2</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'รางวัลรองชนะเลิศ อันดับที่ 3' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 3</option>
-                    <option value="ผู้เข้าร่วมการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้เข้าร่วมการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมการแข่งขัน</option>
-                    <option value="ผู้ควบคุมทีม" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้ควบคุมทีม' ? 'selected' : '' ?>>ผู้ควบคุมทีม</option>
-                    <option value="กรรมการจัดการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'กรรมการจัดการแข่งขัน' ? 'selected' : '' ?>>กรรมการจัดการแข่งขัน</option>
-                    <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($participant['certificate_type']) && $participant['certificate_type'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
+                    <option value="รางวัลชนะเลิศ" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลชนะเลิศ' ? 'selected' : '' ?>>รางวัลชนะเลิศ</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 1' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 1</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 2' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 2</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 3' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 3</option>
+                    <option value="ผู้เข้าร่วมการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้เข้าร่วมการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมการแข่งขัน</option>
+                    <option value="ผู้ควบคุมทีม" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้ควบคุมทีม' ? 'selected' : '' ?>>ผู้ควบคุมทีม</option>
+                    <option value="กรรมการจัดการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'กรรมการจัดการแข่งขัน' ? 'selected' : '' ?>>กรรมการจัดการแข่งขัน</option>
+                    <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
                 </select>
                 </div>
 
@@ -72,10 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="mb-3">
                 <label class="form-label">รุ่นเกียรติบัตร</label>
     <select name="model" class="form-control" required>
-        <option value="รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา" <?= $participant['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
+        <option value="model1" <?= $participant['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
             แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )
         </option>
-        <option value="รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป" <?= $participant['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
+        <option value="model2" <?= $participant['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
             แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)
         </option>
     </select>

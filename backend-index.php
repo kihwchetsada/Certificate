@@ -37,8 +37,8 @@
             <div class="mb-4">
                 <label class="form-label">เลือกรุ่นของเกียรติบัตร</label>
                 <select name="model" class="form-control" required>
-                    <option value="รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา">แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )</option>
-                    <option value="รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป">แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)</option>
+                    <option value="model1">แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )</option>
+                    <option value="model2">แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary w-100 py-2 mb-2"> ลงทะเบียน</button>
