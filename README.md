@@ -48,7 +48,7 @@ DB_NAME=certificate_db
 📦 certificate-system
  ┣ 📂 assets/
  ┃ ┣ 📂 fonts/
- ┃ ┣ 📂 templates/
+ ┃ ┣ 📜 templates.jpg
  ┃ ┗ 📂 css/
  ┣ 📂 certificates/
  ┣ 📂 vendor/
@@ -87,11 +87,10 @@ https://your-domain.com/check_certificate.php?code=XXXXX
 ```bash
 # 1. เตรียมไฟล์ JPG
 assets/
-  └── templates/
-      └── certificate_template.jpg
+  └── template.jpg
 
 # 2. แก้ไขการอ้างอิงใน generate.php
-$template = 'assets/templates/certificate_template.jpg';
+$template = 'assets/template.jpg';
 ```
 
 ### การเพิ่มฟอนต์
