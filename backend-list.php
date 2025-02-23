@@ -8,32 +8,44 @@ $page = max($page, 1);
 $offset = ($page - 1) * $limit;
 $totalPages = 1;
 $participants = [];
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 try {
-    // นับจำนวนรายการทั้งหมดก่อน
-    $totalStmt = $pdo->query("SELECT COUNT(*) FROM participants");
-    $totalRows = $totalStmt->fetchColumn();
-    $totalPages = ceil($totalRows / $limit);
+        // นับจำนวนรายการทั้งหมดก่อน
+        if ($search) {
+            $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM participants WHERE name LIKE :search");
+            $totalStmt->execute([':search' => "%$search%"]);
+        } else {
+            $totalStmt = $pdo->query("SELECT COUNT(*) FROM participants");
+        }
+        $totalRows = $totalStmt->fetchColumn();
+        $totalPages = ceil($totalRows / $limit);
 
-    // ดึงข้อมูลตามหน้าที่ต้องการ
-    $stmt = $pdo->prepare("SELECT * FROM participants ORDER BY id DESC LIMIT :limit OFFSET :offset");
-    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // ดึงข้อมูลตามหน้าที่ต้องการ
+        if ($search) {
+            $stmt = $pdo->prepare("SELECT * FROM participants WHERE name LIKE :search ORDER BY id DESC LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM participants ORDER BY id DESC LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
 
-    if ($page > $totalPages) {
-        header("Location: ?page=" . $totalPages);
-        exit();
-    }
+        $stmt->execute();
+        $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-} catch (PDOException $e) {
-    $error = "เกิดข้อผิดพลาด: " . $e->getMessage();
-    $participants = [];
-    $totalPages = 1;
-}
+        if ($page > $totalPages) {
+            header("Location: ?page=" . $totalPages . "&search=" . urlencode($search));
+            exit();
+        }
 
-$hasData = !empty($participants);
+        } catch (PDOException $e) {
+        $error = "เกิดข้อผิดพลาด: " . $e->getMessage();
+        $participants = [];
+        $totalPages = 1;
+        }
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -47,6 +59,7 @@ $hasData = !empty($participants);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
+   
     <div class="container">
         <h2 class="page-title animate__animated animate__fadeInDown">📋 รายชื่อผู้ลงทะเบียน</h2>
         
@@ -94,21 +107,39 @@ $hasData = !empty($participants);
             </div>
         <?php endif; ?>
 
-        <nav aria-label="Page navigation">
+            <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
-                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>">⬅️ ก่อนหน้า</a>
-                </li>
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                <?php if ($page > 1): ?>
+                    <li><a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">⬅️</a></li>
+                <?php endif; ?>
+
+                <?php if ($page > 3): ?>
+                    <li><span>...</span></li>
+                <?php endif; ?>
+
+                <?php for ($i = max(1, $page - 1); $i <= min($totalPages, $page + 1); $i++): ?>
+                    <li <?= ($page == $i) ? 'class="active"' : '' ?>>
+                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
                     </li>
                 <?php endfor; ?>
-                <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>">ถัดไป ➡️</a>
-                </li>
+
+                <?php if ($page < $totalPages - 2): ?>
+                    <li><span>...</span></li>
+                <?php endif; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <li><a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">➡️</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
+
+        <div class="search-container">
+        <form method="GET" action="">
+            <input type="text" name="search" placeholder="🔍 ค้นหาชื่อ..." value="<?= htmlspecialchars($search) ?>">
+            <button type="submit">ค้นหา</button>
+            <a href="backend-list.php" class="back-button">กลับ</a>
+        </form>
+    </div>
 
         <div class="text-center">
             <a href="backend-index.php" class="btn back-button">กลับไปลงทะเบียน</a>
