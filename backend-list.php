@@ -136,7 +136,7 @@ try {
         <div class="search-container">
         <form method="GET" action="">
             <input type="text" name="search" placeholder="🔍 ค้นหาชื่อ..." value="<?= htmlspecialchars($search) ?>">
-            <button type="submit">ค้นหา</button>
+            <button type="submit" class="back-button">ค้นหา</button>
             <a href="backend-list.php" class="back-button">กลับ</a>
         </form>
     </div>

@@ -48,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label class="form-label">ชื่อ-นามสกุล</label>
                     <input type="text" name="name" class="form-control" placeholder="กรอกชื่อ-นามสกุล" value="<?= htmlspecialchars($participant['name']) ?>" required>
                 </div>
-
                 <div class="mb-3">
                 <label class="form-label">หัวข้อเกียรติบัตร</label>
                 <select name="detail" class="form-control" required>
@@ -63,24 +62,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
                 </select>
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">วันที่</label>
                     <input type="date" name="datenew" class="form-control" value="<?= htmlspecialchars($participant['datenew']) ?>" required>
                 </div>
-
                 <div class="mb-3">
                 <label class="form-label">รุ่นเกียรติบัตร</label>
-    <select name="model" class="form-control" required>
-        <option value="model1" <?= $participant['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
-            แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )
-        </option>
-        <option value="model2" <?= $participant['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
-            แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)
-        </option>
-    </select>
+                <select name="model" class="form-control" required>
+                    <option value="model1" <?= $participant['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
+                        แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )
+                    </option>
+                    <option value="model2" <?= $participant['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
+                        แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)
+                    </option>
+                </select>
                 </div>
-
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">บันทึก</button>
                     <a href="backend-list.php" class="btn btn-secondary">กลับ</a>
@@ -102,5 +98,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
         </script>
     <?php endif; ?>
+
 </body>
 </html>

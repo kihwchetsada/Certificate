@@ -23,6 +23,9 @@
             <button type="submit" class="btn btn-search w-100">
                <i class="fas fa-search me-2"></i>ค้นหาเกียรติบัตร
             </button>
+            <a href="list.php" class="btn btn-search w-100 mt-2">
+            <i class="fas fa-list me-2"></i>ดูรายชื่อ
+            </a>
          </form>
       </div>
    </div>
