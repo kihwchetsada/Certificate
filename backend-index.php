@@ -45,6 +45,7 @@
         </form>
         <div class="text-center mt-4">
             <a href="backend-list.php" class="btn btn-info" style="width: 250px;"> ดูรายชื่อผู้ลงทะเบียน</a>
+            <a href="../organizer_dashboard.php" class="btn btn-info" style="width: 250px;">กลับไปหน้าหลัก</a>
         </div>
     </div>
 </body>
