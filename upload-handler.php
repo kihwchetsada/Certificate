@@ -4,7 +4,8 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image']) && isset($_POST['target'])) {
     $file = $_FILES['image'];
     $target = $_POST['target'];
-    $allowedTargets = ['logo', 'banner', 'background'];
+    // ปรับเป็นชื่อไฟล์ที่ต้องการแทนที่
+    $allowedTargets = ['certificate_template', 'certificate_template1'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
     if ($file['error'] !== 0) {
@@ -25,6 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image']) && isset($_
     if ($file['size'] > 2 * 1024 * 1024) {
         echo json_encode(['success' => false, 'message' => 'ขนาดไฟล์เกิน 2MB']);
         exit;
+    }
+
+    // ตรวจสอบว่าโฟลเดอร์ assets มีอยู่หรือไม่
+    if (!is_dir('assets')) {
+        mkdir('assets', 0755, true);
     }
 
     $targetPath = "assets/{$target}.jpg";
