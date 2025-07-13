@@ -11,6 +11,7 @@
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+    <button onclick="location.href='../../annunciate.php'">กลับไป</button>
    <div class="container">
       <h3 class="title-heading">ระบบค้นหารายชื่อเกียรติบัตร</h3>
       <h2 class="title-body">The <?php echo date('Y') - 2020 ; ?> <sup>th</sup> SURIN RMUTI E-SPORT <?php echo date('Y'); ?></h2><br>
