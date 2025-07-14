@@ -11,7 +11,6 @@
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <button onclick="location.href='../../annunciate.php'">กลับไป</button>
    <div class="container">
       <h3 class="title-heading">ระบบค้นหารายชื่อเกียรติบัตร</h3>
       <h2 class="title-body">The <?php echo date('Y') - 2020 ; ?> <sup>th</sup> SURIN RMUTI E-SPORT <?php echo date('Y'); ?></h2><br>
@@ -21,12 +20,9 @@
                <label class="form-label">ชื่อผู้รับเกียรติบัตร</label>
                <input type="text" name="name" class="form-control" placeholder="กรุณากรอกชื่อ-นามสกุล" required>
             </div>
-            <button type="submit" class="btn btn-search w-100">
-               <i class="fas fa-search me-2"></i>ค้นหาเกียรติบัตร
-            </button>
-            <a href="list.php" class="btn btn-search w-100 mt-2">
-            <i class="fas fa-list me-2"></i>ดูรายชื่อ
-            </a>
+            <button type="submit" class="btn btn-search w-100">ค้นหาเกียรติบัตร</button>
+            <a href="list.php" class="btn btn-search w-100 mt-2">ดูรายชื่อ</a>
+            <button class="buttonback w-100" onclick="location.href='../../annunciate.php'">กลับไป</button>
          </form>
       </div>
    </div>

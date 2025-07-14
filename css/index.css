@@ -19,6 +19,45 @@ body {
     background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(142, 68, 173, 0.3));
     pointer-events: none;
  }
+ 
+   .buttonback {
+   width: 6.5em;
+   height: 2.3em;
+   margin: 0.5em;
+   background: black;
+   color: white;
+   border: none;
+   border-radius: 0.625em;
+   font-size: 20px;
+   font-weight: bold;
+   cursor: pointer;
+   
+   z-index: 1;
+   overflow: hidden;
+   }
+
+   .buttonback:hover {
+   color: black;
+   }
+
+   .buttonback:after {
+   content: "";
+   background: white;
+   position: absolute;
+   z-index: -1;
+   left: -20%;
+   right: -20%;
+   top: 0;
+   bottom: 0;
+   transform: skewX(-45deg) scale(0, 1);
+   transition: all 0.5s;
+   }
+
+   .buttonback:hover:after {
+   transform: skewX(-45deg) scale(1, 1);
+   -webkit-transition: all 0.5s;
+   transition: all 0.5s;
+   }
 
  .container {
     width: 100%;
