@@ -22,7 +22,7 @@
             </div>
             <button type="submit" class="btn btn-search w-100">ค้นหาเกียรติบัตร</button>
             <a href="list.php" class="btn btn-search w-100 mt-2">ดูรายชื่อ</a>
-            <button class="buttonback w-100" onclick="location.href='../../annunciate.php'">กลับไป</button>
+            <button class="btn btn-search w-100 mt-2" onclick="location.href='../../annunciate.php'">กลับไปหน้าข่าวสาร</button>
          </form>
       </div>
    </div>
