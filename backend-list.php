@@ -13,22 +13,22 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 try {
         // นับจำนวนรายการทั้งหมดก่อน
         if ($search) {
-            $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM participants WHERE name LIKE :search");
+            $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM certificate WHERE name LIKE :search");
             $totalStmt->execute([':search' => "%$search%"]);
         } else {
-            $totalStmt = $pdo->query("SELECT COUNT(*) FROM participants");
+            $totalStmt = $pdo->query("SELECT COUNT(*) FROM certificate");
         }
         $totalRows = $totalStmt->fetchColumn();
         $totalPages = ceil($totalRows / $limit);
 
         // ดึงข้อมูลตามหน้าที่ต้องการ
         if ($search) {
-            $stmt = $pdo->prepare("SELECT * FROM participants WHERE name LIKE :search ORDER BY id DESC LIMIT :limit OFFSET :offset");
+            $stmt = $pdo->prepare("SELECT * FROM certificate WHERE name LIKE :search ORDER BY id DESC LIMIT :limit OFFSET :offset");
             $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM participants ORDER BY id DESC LIMIT :limit OFFSET :offset");
+            $stmt = $pdo->prepare("SELECT * FROM certificate ORDER BY id DESC LIMIT :limit OFFSET :offset");
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         }

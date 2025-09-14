@@ -12,7 +12,7 @@ if (isset($_POST['name'])) {
     if (!empty($name)) {
         try {
             // ค้นหาข้อมูลในฐานข้อมูล
-            $query = "SELECT * FROM participants WHERE name = ?";
+            $query = "SELECT * FROM certificate WHERE name = ?";
             $stmt = $pdo->prepare($query);
             $stmt->execute([$name]);
             $result = $stmt->fetch();

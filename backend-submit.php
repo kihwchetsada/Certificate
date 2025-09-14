@@ -8,7 +8,7 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $model = $_POST['model'] ?? 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา';
 
     if (!empty($name) && !empty($detail) && !empty($model)) {
-        $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM participants WHERE name = ?");
+        $checkStmt = $conn->prepare("SELECT COUNT(*) FROM certificate WHERE name = ?");
         $checkStmt->execute([$name]);
         $exists = $checkStmt->fetchColumn();
 
@@ -18,8 +18,8 @@ if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
                     window.location.href = 'backend-index.php';
                   </script>";
         } else {
-            $stmt = $pdo->prepare("INSERT INTO participants (name, detail, datenew, model) VALUES (?, ?, ?, ?)");
-            
+            $stmt = $conn->prepare("INSERT INTO certificate (name, detail, datenew, model) VALUES (?, ?, ?, ?)");
+
             if ($stmt->execute([$name, $detail, $date, $model])) {
                 echo "<script>
                         alert('✅ ลงทะเบียนสำเร็จ');

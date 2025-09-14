@@ -9,7 +9,7 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     try {
-        $stmt = $pdo->prepare("DELETE FROM participants WHERE id = ?");
+        $stmt = $conn->prepare("DELETE FROM certificate WHERE id = ?");
         $stmt->execute([$id]);
 
         $alertType = "success";

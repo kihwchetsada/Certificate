@@ -3,11 +3,11 @@ require('database.php');
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $stmt = $pdo->prepare("SELECT * FROM participants WHERE id = ?");
+    $stmt = $conn->prepare("SELECT * FROM certificate WHERE id = ?");
     $stmt->execute([$id]);
-    $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+    $certificate = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$participant) {
+    if (!$certificate) {
         die("❌ ไม่พบข้อมูล");
     }
 } else {
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $date = $_POST['datenew'];
     $model = $_POST['model']; 
 
-    $stmt = $pdo->prepare("UPDATE participants SET name=?, detail=?, datenew=?, model=? WHERE id=?");
+    $stmt = $conn->prepare("UPDATE certificate SET name=?, detail=?, datenew=?, model=? WHERE id=?");
     if ($stmt->execute([$name, $detail, $date, $model, $id])) {
         $success = true;
     }
@@ -52,27 +52,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label class="form-label">หัวข้อเกียรติบัตร</label>
                 <select name="detail" class="form-control" required>
                     <option value="" disabled selected>กรุณาเลือกหัวข้อเกียรติบัตร</option>
-                    <option value="รางวัลชนะเลิศ" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลชนะเลิศ' ? 'selected' : '' ?>>รางวัลชนะเลิศ</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 1' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 1</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 2' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 2</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3" <?= isset($participant['detail']) && $participant['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 3' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 3</option>
-                    <option value="ผู้เข้าร่วมการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้เข้าร่วมการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมการแข่งขัน</option>
-                    <option value="ผู้ควบคุมทีม" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้ควบคุมทีม' ? 'selected' : '' ?>>ผู้ควบคุมทีม</option>
-                    <option value="กรรมการจัดการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'กรรมการจัดการแข่งขัน' ? 'selected' : '' ?>>กรรมการจัดการแข่งขัน</option>
-                    <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($participant['detail']) && $participant['detail'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
+                    <option value="รางวัลชนะเลิศ" <?= isset($certificate['detail']) && $certificate['detail'] == 'รางวัลชนะเลิศ' ? 'selected' : '' ?>>รางวัลชนะเลิศ</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1" <?= isset($certificate['detail']) && $certificate['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 1' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 1</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2" <?= isset($certificate['detail']) && $certificate['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 2' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 2</option>
+                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3" <?= isset($certificate['detail']) && $certificate['detail'] == 'รางวัลรองชนะเลิศ อันดับที่ 3' ? 'selected' : '' ?>>รางวัลรองชนะเลิศ อันดับที่ 3</option>
+                    <option value="ผู้เข้าร่วมการแข่งขัน" <?= isset($certificate['detail']) && $certificate['detail'] == 'ผู้เข้าร่วมการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมการแข่งขัน</option>
+                    <option value="ผู้ควบคุมทีม" <?= isset($certificate['detail']) && $certificate['detail'] == 'ผู้ควบคุมทีม' ? 'selected' : '' ?>>ผู้ควบคุมทีม</option>
+                    <option value="กรรมการจัดการแข่งขัน" <?= isset($certificate['detail']) && $certificate['detail'] == 'กรรมการจัดการแข่งขัน' ? 'selected' : '' ?>>กรรมการจัดการแข่งขัน</option>
+                    <option value="ผู้เข้าร่วมจัดการแข่งขัน" <?= isset($certificate['detail']) && $certificate['detail'] == 'ผู้เข้าร่วมจัดการแข่งขัน' ? 'selected' : '' ?>>ผู้เข้าร่วมจัดการแข่งขัน</option>
                 </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">วันที่</label>
-                    <input type="date" name="datenew" class="form-control" value="<?= htmlspecialchars($participant['datenew']) ?>" required>
+                    <input type="date" name="datenew" class="form-control" value="<?= htmlspecialchars($certificate['datenew']) ?>" required>
                 </div>
                 <div class="mb-3">
                 <label class="form-label">รุ่นเกียรติบัตร</label>
                 <select name="model" class="form-control" required>
-                    <option value="model1" <?= $participant['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
+                    <option value="model1" <?= $certificate['model'] == 'รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา' ? 'selected' : '' ?>>
                         แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )
                     </option>
-                    <option value="model2" <?= $participant['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
+                    <option value="model2" <?= $certificate['model'] == 'รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป' ? 'selected' : '' ?>>
                         แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)
                     </option>
                 </select>

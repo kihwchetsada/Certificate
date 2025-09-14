@@ -8,7 +8,7 @@ $result = [];
 if (!empty($query)) {
     try {
         // ค้นหาชื่อที่ตรงกับคำค้นหา
-        $stmt = $pdo->prepare("SELECT id, name FROM participants WHERE name LIKE :query ORDER BY 
+        $stmt = $pdo->prepare("SELECT id, name FROM certificate WHERE name LIKE :query ORDER BY 
             CASE 
                 WHEN name LIKE :exact THEN 1
                 WHEN name LIKE :start THEN 2

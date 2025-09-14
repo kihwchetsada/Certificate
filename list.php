@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require 'database.php'; // เชื่อมต่อฐานข้อมูล
 
 // รับค่าการค้นหา
@@ -16,11 +19,11 @@ $offset = ($current_page - 1) * $items_per_page;
 
 try {
     // นับจำนวนรายการทั้งหมดเพื่อคำนวณหน้าทั้งหมด
-    $count_sql = "SELECT COUNT(*) as total FROM participants";
+    $count_sql = "SELECT COUNT(*) as total FROM certificate";
     if ($search) {
         $count_sql .= " WHERE name LIKE :search";
     }
-    $count_stmt = $pdo->prepare($count_sql);
+    $count_stmt = $conn->prepare($count_sql);
     if ($search) {
         $count_stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
     }
@@ -29,13 +32,13 @@ try {
     $total_pages = ceil($total_items / $items_per_page);
 
     // ดึงข้อมูลตามหน้าที่ต้องการ
-    $sql = "SELECT id, name FROM participants";
+    $sql = "SELECT id, name FROM certificate";
     if ($search) {
         $sql .= " WHERE name LIKE :search";
     }
     $sql .= " LIMIT :limit OFFSET :offset";
 
-    $stmt = $pdo->prepare($sql);
+    $stmt = $conn->prepare($sql);
     if ($search) {
         $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
     }
