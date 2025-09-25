@@ -108,7 +108,7 @@ if (!empty($name)) {
         }
 
         // บันทึกลงฐานข้อมูล
-        $stmt = $pdo->prepare("INSERT INTO certificates (name, detail, file_path) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO certificates (name, detail, file_path) VALUES (?, ?, ?)");
         if (!$stmt->execute([$name, $detail, $filename])) {
             throw new Exception("ไม่สามารถบันทึกข้อมูลในฐานข้อมูล");
         }

@@ -1,3 +1,8 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -6,29 +11,29 @@
     <title>จัดการเทมเพลตเกียรติบัตร</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
+<style>
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: #eef2f6; /* สีพื้นหลังที่ดูสบายตา */
+            background-color: #eef2f6;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* จัดให้อยู่ด้านบนของหน้า */
+            align-items: flex-start;
             min-height: 100vh;
         }
         .main-wrapper {
-            max-width: 900px; /* เพิ่มความกว้างสูงสุด */
+            max-width: 900px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 30px; /* ระยะห่างระหว่างกล่อง */
+            gap: 30px;
         }
         .container {
             background: white;
             padding: 30px;
-            border-radius: 12px; /* มุมโค้งมนที่สวยงามขึ้น */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* เงาที่ลึกขึ้นแต่ดูนุ่มนวล */
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .container:hover {
@@ -36,26 +41,26 @@
             box-shadow: 0 12px 25px rgba(0,0,0,0.12);
         }
         h2 {
-            color: #2c3e50; /* สีหัวข้อที่เข้มขึ้น */
+            color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
-            font-weight: 600; /* ตัวหนาขึ้นเล็กน้อย */
+            font-weight: 600;
             font-size: 1.8em;
         }
         form {
             display: flex;
             flex-direction: column;
-            gap: 20px; /* เพิ่มระยะห่างในฟอร์ม */
+            gap: 20px;
         }
         label {
-            font-weight: 500; /* ตัวหนาปานกลาง */
+            font-weight: 500;
             color: #34495e;
             font-size: 1.05em;
-            margin-bottom: 5px; /* ระยะห่างกับ input */
+            margin-bottom: 5px;
         }
-        select, input[type="file"], input[type="text"] { /* เพิ่ม input[type="text"] เผื่อในอนาคต */
+        select, input[type="file"], input[type="text"] {
             padding: 12px;
-            border: 1px solid #c8d6e5; /* สีขอบที่ดูสะอาดตา */
+            border: 1px solid #c8d6e5;
             border-radius: 8px;
             font-size: 16px;
             color: #34495e;
@@ -63,13 +68,12 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         select:focus, input[type="file"]:focus, input[type="text"]:focus {
-            border-color: #3498db; /* สีเมื่อ focus */
+            border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
             outline: none;
         }
-        /* Custom file input styling */
         input[type="file"] {
-            display: none; /* ซ่อน input เดิม */
+            display: none;
         }
         .custom-file-upload {
             border: 1px solid #c8d6e5;
@@ -94,7 +98,6 @@
             color: #555;
             font-style: italic;
         }
-
         button {
             padding: 12px 25px;
             border: none;
@@ -109,7 +112,7 @@
             gap: 8px;
         }
         button[type="submit"] {
-            background-color: #2ecc71; /* สีเขียวสดใส */
+            background-color: #2ecc71;
             color: white;
         }
         button[type="submit"]:hover {
@@ -117,8 +120,8 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
         }
-        button[type="button"] { /* ปุ่มรีเซ็ต */
-            background-color: #e74c3c; /* สีแดง */
+        button[type="button"] {
+            background-color: #e74c3c;
             color: white;
         }
         button[type="button"]:hover {
@@ -158,7 +161,7 @@
             display: inline-block;
             margin-top: 25px;
             padding: 12px 25px;
-            background-color: #3498db; /* สีน้ำเงิน */
+            background-color: #3498db;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -177,10 +180,9 @@
             text-align: center;
             font-weight: 500;
         }
-        /* --- CSS ส่วนแสดงผลเทมเพลต --- */
         .template-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* ปรับขนาดให้เหมาะสม */
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-top: 20px;
         }
@@ -214,7 +216,7 @@
         }
         .placeholder-image {
             width: 100%;
-            height: 200px; /* กำหนดความสูงสำหรับ placeholder */
+            height: 200px;
             background-color: #f0f2f5;
             color: #aebfd4;
             display: flex;
@@ -228,11 +230,9 @@
         .placeholder-image i {
             margin-right: 10px;
         }
-
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .template-grid {
-                grid-template-columns: 1fr; /* ให้แสดงเป็นคอลัมน์เดียวบนมือถือ */
+                grid-template-columns: 1fr;
             }
             .main-wrapper {
                 padding: 15px;
@@ -244,10 +244,10 @@
                 font-size: 1.5em;
             }
             .button-group {
-                flex-direction: column; /* ปุ่มเรียงกันในแนวตั้ง */
+                flex-direction: column;
             }
             button {
-                width: 100%; /* ปุ่มเต็มความกว้าง */
+                width: 100%;
             }
         }
     </style>
@@ -270,7 +270,7 @@
         </div>
         <div class="container">
             <h2><i class="fas fa-upload"></i> อัปโหลดเพื่อแทนที่เทมเพลต</h2>
-            <p style="text-align: center; color: #555; margin-top: -15px; margin-bottom: 25px;">(ไฟล์ .jpg เท่านั้น, ขนาดไม่เกิน 2MB)</p>
+            <p style="text-align: center; color: #555; margin-top: -15px; margin-bottom: 25px;">(ไฟล์ .jpg เท่านั้น, ขนาดไม่เกิน 5MB)</p>
             <form id="uploadForm">
                 <label for="target">เลือกเทมเพลตที่ต้องการแทนที่:</label>
                 <select name="target" id="target" required>
@@ -303,7 +303,6 @@
     </div>
 
     <script>
-        // แสดงชื่อไฟล์เมื่อเลือก
         document.getElementById('imageInput').addEventListener('change', function () {
             const fileNameSpan = document.getElementById('file-name');
             if (this.files.length > 0) {
@@ -332,18 +331,19 @@
                 return;
             }
 
-            if (file.type !== 'image/jpeg') {
+            // ▼▼▼ (แก้ไข) เปลี่ยนเงื่อนไขการตรวจสอบไฟล์ ▼▼▼
+            if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
                 document.getElementById('message').innerHTML = '<p style="color:red;">❌ กรุณาเลือกไฟล์ .jpg เท่านั้น</p>';
                 return;
             }
 
-            if (file.size > 2 * 1024 * 1024) {
-                document.getElementById('message').innerHTML = '<p style="color:red;">❌ ขนาดไฟล์ต้องไม่เกิน 2MB</p>';
+            if (file.size > 5 * 1024 * 1024) {
+                document.getElementById('message').innerHTML = '<p style="color:red;">❌ ขนาดไฟล์ต้องไม่เกิน 5MB</p>';
                 return;
             }
 
             const submitBtn = document.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML; // เก็บ HTML ของปุ่มไว้ (รวม icon)
+            const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...';
             submitBtn.disabled = true;
 
@@ -363,10 +363,9 @@
                     : `<p style="color:#c0392b; font-weight:bold;"><i class="fas fa-times-circle"></i> ${data.message}</p>`;
 
                 if (data.success) {
-                    // รีโหลดหน้าเพื่อให้เห็น template ใหม่หลังจากอัปโหลดสำเร็จ
                     setTimeout(() => {
                         window.location.reload();
-                    }, 1500); // รีโหลดเร็วขึ้น
+                    }, 1500);
                 }
             })
             .catch(err => {
@@ -385,11 +384,11 @@
             const previewContainer = document.getElementById('previewContainer');
             const file = input.files[0];
 
-            if (file && file.type === 'image/jpeg') {
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/jpg')) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     preview.src = e.target.result;
-                    previewContainer.style.display = 'flex'; // ใช้ flex เพื่อจัดกึ่งกลาง
+                    previewContainer.style.display = 'flex';
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -398,7 +397,7 @@
         }
 
         function resetForm() {
-            document.getElementById('uploadForm').reset(); // รีเซ็ตฟอร์มทั้งหมด
+            document.getElementById('uploadForm').reset();
             document.getElementById('file-name').textContent = 'ยังไม่ได้เลือกไฟล์';
             resetPreview();
             document.getElementById('message').innerHTML = '';
@@ -411,10 +410,8 @@
             previewContainer.style.display = 'none';
         }
 
-        // ตรวจสอบและแสดง placeholder หากรูปภาพเทมเพลตไม่โหลด
         document.querySelectorAll('.template-item img').forEach(img => {
             img.addEventListener('error', function() {
-                // ถ้ามี error, จะถูกแทนที่ด้วย div ที่มีข้อความ "ไม่พบรูปภาพ"
             });
         });
     </script>
