@@ -54,43 +54,39 @@
             type: 'POST',
             data: { name: name },  // ส่งชื่อไปเป็นข้อมูล
             success: function(response) {
-                if (response === "found") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'พบข้อมูลเกียรติบัตร',
-                        text: 'กำลังจัดเตรียมเอกสารของคุณ...',
-                        timer: 2000,
-                        timerProgressBar: true,
-                        showConfirmButton: false
-                    }).then(function() {
-                        window.location.href = "generate.php?name=" + encodeURIComponent(name);
-                    });
-                } else if (response === "not found") {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'ไม่พบข้อมูล',
-                        text: 'ไม่พบรายชื่อในระบบ กรุณาตรวจสอบการสะกดชื่อ-นามสกุลอีกครั้ง',
-                        confirmButtonText: 'ลองใหม่',
-                        confirmButtonColor: '#4a90e2'
-                    });
-                } else if (response === "empty name") {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'กรุณากรอกชื่อ',
-                        text: 'ชื่อไม่สามารถเป็นค่าว่างได้',
-                        confirmButtonText: 'ปิด',
-                        confirmButtonColor: '#4a90e2'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'ไม่สามารถเชื่อมต่อกับระบบได้ กรุณาลองใหม่ภายหลัง',
-                        confirmButtonText: 'ปิด',
-                        confirmButtonColor: '#4a90e2'
-                    });
-                }
-            },
+    // ตรวจสอบว่า response ที่ได้กลับมา ไม่ใช่ข้อความ "not found", "empty name" หรือ "error"
+    // ถ้าไม่ใช่ แสดงว่าเป็น member_id ที่ถูกต้อง
+    if (response !== "not found" && response !== "empty name" && response !== "error") {
+        Swal.fire({
+            icon: 'success',
+            title: 'พบข้อมูลเกียรติบัตร',
+            text: 'กำลังจัดเตรียมเอกสารของคุณ...',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        }).then(function() {
+            // ส่ง member_id ที่ได้รับมา ไปยัง generate.php
+            window.location.href = "generate.php?member_id=" + response;
+        });
+    } else if (response === "not found") {
+        Swal.fire({
+            icon: 'error',
+            title: 'ไม่พบข้อมูล',
+            text: 'ไม่พบรายชื่อในระบบ กรุณาตรวจสอบการสะกดชื่อ-นามสกุลอีกครั้ง',
+            confirmButtonText: 'ลองใหม่',
+            confirmButtonColor: '#4a90e2'
+        });
+    } else {
+        // กรณีอื่นๆ ที่เป็น Error
+        Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถเชื่อมต่อกับระบบได้ กรุณาลองใหม่ภายหลัง',
+            confirmButtonText: 'ปิด',
+            confirmButtonColor: '#4a90e2'
+        });
+    }
+},
             error: function() {
                 Swal.fire({
                     icon: 'error',

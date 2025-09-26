@@ -1,218 +1,139 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
+// generate.php
 
-require('database.php');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Path ไปยัง autoload.php ของ Composer
+require_once __DIR__ . '/../../vendor/autoload.php';
+// Path ไปยังไฟล์เชื่อมต่อฐานข้อมูลของคุณ
+require_once __DIR__ . '/../../db_connect.php'; 
 
 use setasign\Fpdi\Fpdi;
 
-// สร้างและตรวจสอบโฟลเดอร์ certificates
-if (!file_exists('certificates')) {
-    mkdir('certificates', 0755, true);
+// 1. รับและตรวจสอบ member_id จาก URL
+$member_id = isset($_GET['member_id']) ? filter_var($_GET['member_id'], FILTER_VALIDATE_INT) : null;
+
+if (!$member_id) {
+    die("Error: Missing or invalid member_id parameter.");
 }
 
-// รับและทำความสะอาดค่า name
-$name = isset($_POST['name']) ? trim($_POST['name']) : (isset($_GET['name']) ? trim($_GET['name']) : '');
-$name = preg_replace('/[^a-zA-Z0-9ก-๙\s]/u', '', $name);
+try {
+    // 2. ดึงข้อมูลที่จำเป็นจากฐานข้อมูล
+    // แก้ไข JOIN และ WHERE clause ตามโครงสร้างตารางล่าสุดของคุณ
+    $sql = "SELECT
+                tm.member_name,
+                t.team_name,
+                tn.tournament_name
+            FROM
+                team_members AS tm
+            JOIN
+                teams AS t ON tm.team_id = t.team_id
+            JOIN
+                tournaments AS tn ON t.tournament_id = tn.id
+            WHERE
+                tm.member_id = :member_id"; 
 
-if (!empty($name)) {
-    try {
-        // ดึงข้อมูลจากฐานข้อมูล
-        $stmt = $pdo->prepare("SELECT * FROM participants WHERE name = ?");
-        $stmt->execute([$name]);
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(['member_id' => $member_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($stmt->rowCount() == 0) {
-            throw new Exception("ไม่พบข้อมูลในระบบ กรุณาลงทะเบียนก่อน");
-        }
-
-        $participant = $stmt->fetch();
-        $detail = $participant['detail'];
-        $model = $participant['model'];
-
-        // ตรวจสอบและโหลดเทมเพลต
-        $templatePaths = [
-            'model1' => "assets/certificate_template.jpg",
-            'model2' => "assets/certificate_template1.jpg",
-        ];
-
-        $templatePath = $templatePaths[$model] ?? "assets/certificate_template.jpg"; // โมเดลเริ่มต้น 
-        if (!file_exists($templatePath)) {
-            throw new Exception("ไม่พบไฟล์เทมเพลต");
-        }
-
-        // สร้างรูปภาพ
-        $template = @imagecreatefromjpeg($templatePath);
-        if (!$template) {
-            throw new Exception("ไม่สามารถโหลดเทมเพลตได้");
-        }
-
-        // ตรวจสอบฟอนต์
-        $font = "assets/fonts/TH Sarabun New Bold.ttf"; // ฟอนต์ TH Sarabun New Bold 
-        if (!file_exists($font)) {
-            imagedestroy($template);
-            throw new Exception("ไม่พบไฟล์ฟอนต์");
-        }
-
-        // สร้างสี
-        $color = imagecolorallocate($template, 0, 0, 0); // สีดำ สำหรับชื่อ
-        $color1 = imagecolorallocate($template, 0, 0, 0); // สีดำ สำหรับรายละเอียด
-
-            // คำนวณตำแหน่งกึ่งกลางของชื่อ
-        $nameBox = imagettfbbox(65, 0, $font, $name);
-        $nameWidth = $nameBox[2] - $nameBox[0]; // ความกว้างของข้อความ
-        $nameX = (imagesx($template) - $nameWidth) / 2; // คำนวณตำแหน่ง X ให้อยู่กลาง
-
-        // คำนวณตำแหน่งกึ่งกลางของรายละเอียด
-        $detailBox = imagettfbbox(45, 0, $font, $detail);
-        $detailWidth = $detailBox[2] - $detailBox[0]; // ความกว้างของข้อความ
-        $detailX = (imagesx($template) - $detailWidth) / 2; // คำนวณตำแหน่ง X ให้อยู่กลาง
-
-        // คำนวณตำแหน่ง Y ให้ข้อความอยู่ในตำแหน่งที่ต้องการ
-        $nameY = 630;  // ปรับตำแหน่ง Y ของชื่อ
-        $detailY = 720;  // ปรับตำแหน่ง Y ของรายละเอียด
-
-        // วาดข้อความ
-        imagettftext($template, 65, 0, $nameX, $nameY, $color, $font, $name); // วาดชื่อ ใช้ฟอนต์ 65 พิกเซล
-        imagettftext($template, 50, 0, $detailX, $detailY, $color1, $font, $detail); // วาดรายละเอียด ใช้ฟอนต์ 50 พิกเซล
-
-
-        // สร้างชื่อไฟล์แบบ unique
-        $uniqueId = uniqid();
-        $tempImage = "certificates/temp_certificate.jpg"; // ไฟล์ชั่วคราว (ใช้บีบอัดภาพเพื่อลดขนาด)
-        $filename = "certificates/{$name}_certificate.pdf"; // ชื่อไฟล์ PDF ที่จะบันทึก (ใช้ชื่อของผู้รับเกียรติบัตร)
-
-        // บันทึกภาพชั่วคราว (ใช้บีบอัดภาพเพื่อลดขนาด)
-        imagejpeg($template, $tempImage, 85);
-        imagedestroy($template);
-
-        // สร้าง PDF
-        $pdf = new Fpdi();
-        $imageWidth = 2000; // ขนาดภาพใน PDF
-        $imageHeight = 1414; // ขนาดภาพใน PDF
-        $imageWidthInMM = ($imageWidth / 72) * 25.4;
-        $imageHeightInMM = ($imageHeight / 72) * 25.4;
-
-        $pdf->AddPage('L', [round($imageWidthInMM), round($imageHeightInMM)]); // เพิ่มหน้าใน PDF แบบ Landscape (แนวนอน) ขนาด A4
-        $pdf->Image($tempImage, 0, 0, $imageWidthInMM, $imageHeightInMM); // แทรกรูปภาพลงใน PDF ที่ตำแหน่ง (0, 0) ขนาดเต็มหน้ากระดาษ A4
-        
-        // บันทึก PDF
-        $pdf->Output('F', $filename); // บันทึกเป็นไฟล์ PDF
-
-        // ลบไฟล์ชั่วคราว
-        if (file_exists($tempImage)) {
-            unlink($tempImage);
-        }
-
-        // ตรวจสอบว่าสร้าง PDF สำเร็จ
-        if (!file_exists($filename)) {
-            throw new Exception("ไม่สามารถสร้างไฟล์ PDF ได้");
-        }
-
-        // บันทึกลงฐานข้อมูล
-        $stmt = $conn->prepare("INSERT INTO certificates (name, detail, file_path) VALUES (?, ?, ?)");
-        if (!$stmt->execute([$name, $detail, $filename])) {
-            throw new Exception("ไม่สามารถบันทึกข้อมูลในฐานข้อมูล");
-        }
-
-        // แสดงหน้า success พร้อมปุ่มดาวน์โหลด
-        echo "<!DOCTYPE html>
-        <html lang='th'>
-        <head>
-            <meta charset='UTF-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <title>เกียรติบัตร | Certificate Generator</title>
-            <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
-            <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap'>
-            <link rel='stylesheet' href='css/generate.css'>
-            <link rel='icon' type='image/png' href='img/b.png'>
-        </head>
-        <body>
-            <div class='container mt-5 text-center'>
-                <div class='card shadow-lg p-5' style='max-width: 600px; margin: auto; border-radius: 15px;'>
-                    <div class='success-icon mb-4'>
-                        <svg width='64' height='64' viewBox='0 0 24 24' fill='none' stroke='#00b894' stroke-width='2'>
-                            <path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path>
-                            <polyline points='22 4 12 14.01 9 11.01'></polyline>
-                        </svg>
-                    </div>
-                    <h2 class='text-success mb-4'>🎉 สร้างเกียรติบัตรสำเร็จ!</h2>
-                    <p class='text-muted mb-4'>คุณสามารถดาวน์โหลดเกียรติบัตรของคุณได้ที่ปุ่มด้านล่าง</p>
-                    <div class='download-section'>
-                        <a href='" . htmlspecialchars($filename) . "' class='btn btn-success btn-lg' download>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' class='me-2'>
-                                <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'></path>
-                                <polyline points='7 10 12 15 17 10'></polyline>
-                                <line x1='12' y1='15' x2='12' y2='3'></line>
-                            </svg>
-                            ดาวน์โหลดเกียรติบัตร
-                        </a>
-                    </div>
-                    <hr class='my-4'>
-                    <div class='d-flex justify-content-center gap-3'>
-                        <a href='index.php' class='btn btn-outline-primary'>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' class='me-2'>
-                                <line x1='19' y1='12' x2='5' y2='12'></line>
-                                <polyline points='12 19 5 12 12 5'></polyline>
-                            </svg>
-                            กลับหน้าหลัก
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>";
-
-    } catch (Exception $e) {
-        // แสดงข้อผิดพลาด
-        echo "<div class='container mt-5 text-center'>
-                <div class='card shadow-lg p-5' style='max-width: 600px; margin: auto; border-radius: 15px;'>
-                    <div class='error-icon mb-4'>
-                        <svg width='64' height='64' viewBox='0 0 24 24' fill='none' stroke='#ff6b6b' stroke-width='2'>
-                            <circle cx='12' cy='12' r='10'></circle>
-                            <line x1='12' y1='8' x2='12' y2='12'></line>
-                            <line x1='12' y1='16' x2='12.01' y2='16'></line>
-                        </svg>
-                    </div>
-                    <h2 class='text-danger mb-4'>❌ เกิดข้อผิดพลาด</h2>
-                    <p class='text-muted mb-4'>" . htmlspecialchars($e->getMessage()) . "</p>
-                    <a href='index.php' class='btn btn-primary'>กลับหน้าหลัก</a>
-                </div>
-              </div>";
+    if (!$result) {
+        throw new Exception("Could not find member data for ID: {$member_id}");
     }
-} else {
-    // แสดงข้อความเมื่อไม่มีข้อมูล
-    echo "<div class='d-flex justify-content-center align-items-center vh-100'>
-        <div class='card shadow-lg p-4 border-0 animate__animated animate__fadeInDown' 
-            style='max-width: 500px; border-radius: 20px; background: linear-gradient(135deg, #ff758c, #ffb199); text-align: center;'>
-            <div class='card-body'>
-                <h2 class='text-white fw-bold'><i class='bi bi-x-circle-fill'></i> กรุณาระบุชื่อผู้รับเกียรติบัตร</h2>
-                <a href='index.php' class='btn btn-light mt-3 px-4 py-2 rounded-pill shadow-sm fw-bold hover-effect text-decoration-none'>กลับหน้าหลัก</a>
-            </div>
-        </div>
-    </div>";
 
-    echo "<style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f8f9fa;
-        }
-        .hover-effect {
-            background-color: white;
-            color: #ff4d6d;
-            font-size: 1.2rem;
-            transition: all 0.3s ease-in-out;
-            display: inline-block;
-        }
-        .hover-effect:hover {
-            background-color: #ff4d6d !important;
-            color: white !important;
-            transform: scale(1.05);
-        }
-        </style>";
+    $memberName = $result['member_name'];
+    //$position = $result['position'];
+    $tournamentName = $result['tournament_name'];
 
-    echo "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'>";
+    $header_line1 = "คณะเกษตรศาสตร์และเทคโนโลยี";
+    $header_line2 = "มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตสุรินทร์";
+    $header_line3 = "ขอมอบเกียรติบัตรนี้ให้ไว้เพื่อแสดงว่า";
+
+    $detail_line1 = "การแข่งขัน “ราชมงคลสุรินทร์ อีสปอร์ต ครั้งที่ " . (date('Y') - 2020) . "” ";
+    $detail_line2 = "การแข่งขัน \"" . $tournamentName . "\"";
+    $detail_line3 = "งานวันเกษตรและเทคโนโลยีอีสาน ครั้งที่ " . (date('Y') - 2013) . "";
+    $detail_line4 = "ขอให้มีความสุข ความเจริญ ประสบความสำเร็จสืบไป";
+    $thai_months = [
+    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
+    "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
+    "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+];
+
+// ดึงข้อมูลวัน, เดือน, ปี ปัจจุบัน
+$day = date('j');
+$month_index = date('n') - 1; // date('n') ให้ค่า 1-12, เราต้องใช้ index 0-11
+$year = date('Y') + 543; // แปลง ค.ศ. เป็น พ.ศ.
+
+// นำมาประกอบเป็นประโยค
+$detail_line5 = "ให้ไว้ ณ วันที่ " . $day . " " . $thai_months[$month_index] . " พ.ศ. " . $year;
+
+    // 4. สร้างรูปภาพเกียรติบัตร
+    // แก้ไข Path ให้ถูกต้องตามโครงสร้างโฟลเดอร์ของคุณ
+    $templatePath = __DIR__ . '/assets/certificate_template.jpg'; 
+    if (!file_exists($templatePath)) {
+      throw new Exception("Certificate template not found. Path checked: " . $templatePath);
+    }
+    
+    $fontPath = __DIR__ . '/assets/fonts/TH Sarabun New Bold.ttf'; 
+    if (!file_exists($fontPath)) {
+      throw new Exception("Font file not found. Path checked: " . $fontPath);
+    }
+
+    $template = @imagecreatefromjpeg($templatePath);
+    if (!$template) {
+        throw new Exception("Could not create image from template. The file might be corrupted.");
+    }
+    $color = imagecolorallocate($template, 0, 0, 0);
+
+    // วาดข้อความลงบน Template
+    $header1Box = imagettfbbox(45, 0, $fontPath, $header_line1);
+    $header1X = (imagesx($template) - ($header1Box[2] - $header1Box[0])) / 2;
+    imagettftext($template, 45, 0, (int)$header1X, 355, $color, $fontPath, $header_line1);
+    $header2Box = imagettfbbox(50, 0, $fontPath, $header_line2);
+    $header2X = (imagesx($template) - ($header2Box[2] - $header2Box[0])) / 2;
+    imagettftext($template, 50, 0, (int)$header2X, 430, $color, $fontPath, $header_line2);
+    $header3Box = imagettfbbox(45, 0, $fontPath, $header_line3);
+    $header3X = (imagesx($template) - ($header3Box[2] - $header3Box[0])) / 2;
+    imagettftext($template, 45, 0, (int)$header3X, 500, $color, $fontPath, $header_line3);
+
+    $nameBox = imagettfbbox(65, 0, $fontPath, $memberName);
+    $nameX = (imagesx($template) - ($nameBox[2] - $nameBox[0])) / 2;
+    imagettftext($template, 65, 0, (int)$nameX, 630, $color, $fontPath, $memberName);
+
+    $detail1Box = imagettfbbox(50, 0, $fontPath, $detail_line1);
+    $detail1X = (imagesx($template) - ($detail1Box[2] - $detail1Box[0])) / 2;
+    imagettftext($template, 50, 0, (int)$detail1X, 720, $color, $fontPath, $detail_line1);
+
+    $detail2Box = imagettfbbox(45, 0, $fontPath, $detail_line2);
+    $detail2X = (imagesx($template) - ($detail2Box[2] - $detail2Box[0])) / 2;
+    imagettftext($template, 45, 0, (int)$detail2X, 800, $color, $fontPath, $detail_line2);
+    $detail3Box = imagettfbbox(50, 0, $fontPath, $detail_line3);
+    $detail3X = (imagesx($template) - ($detail3Box[2] - $detail3Box[0])) / 2;
+    imagettftext($template, 50, 0, (int)$detail3X, 870, $color, $fontPath, $detail_line3);
+    $detail4Box = imagettfbbox(45, 0, $fontPath, $detail_line4);
+    $detail4X = (imagesx($template) - ($detail4Box[2] - $detail4Box[0])) / 2;
+    imagettftext($template, 45, 0, (int)$detail4X, 930, $color, $fontPath, $detail_line4);
+    $detail5Box = imagettfbbox(40, 0, $fontPath, $detail_line5);
+    $detail5X = (imagesx($template) - ($detail5Box[2] - $detail5Box[0])) / 2;
+    imagettftext($template, 40, 0, (int)$detail5X, 990, $color, $fontPath, $detail_line5);
+
+    // 5. สร้างไฟล์ PDF และส่งออกไปที่เบราว์เซอร์
+    $tempImage = tempnam(sys_get_temp_dir(), 'cert_') . '.jpg';
+    imagejpeg($template, $tempImage, 90);
+    imagedestroy($template);
+
+    $pdf = new Fpdi();
+    $pdf->AddPage('L', 'A4');
+    $pdf->Image($tempImage, 0, 0, 297, 210);
+    unlink($tempImage);
+
+    // ส่ง PDF ไปที่เบราว์เซอร์เพื่อแสดงผล (Inline)
+    $pdf->Output('I', 'certificate.pdf');
+    
+} catch (Exception $e) {
+    // หากเกิดข้อผิดพลาด ให้แสดงข้อความเป็น Text ธรรมดาเพื่อให้อ่านง่าย
+    header('Content-Type: text/plain; charset=utf-8');
+    die("An error occurred: " . $e->getMessage());
 }
 ?>
