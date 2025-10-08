@@ -49,7 +49,7 @@ try {
 
     $memberName = $result['member_name'];
     // Use a default tournament name if it's null (for staff)
-    $tournamentName = $result['tournament_name'] ?? 'กิจกรรมมหาวิทยาลัย';
+    $tournamentName = $result['tournament_name'] ?? 'การแข่งขันราชมงคลอีสปอร์ต ครั้งที่ ' . (date('Y') - 2020);
     
     $awardModel = $result['award_model'];
     if (empty($awardModel)) {
