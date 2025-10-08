@@ -1,52 +1,74 @@
-<!DOCTYPE html> 
+<?php
+// backend-index.php
+session_start();
+require __DIR__ . '/../../db_connect.php';
+
+// ดึงรายชื่อสมาชิกทั้งหมดเพื่อมาสร้าง Dropdown
+$members = $conn->query("SELECT member_id, member_name FROM team_members ORDER BY member_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+// กำหนดประเภทรางวัล
+$award_models = [
+    'รางวัลชนะเลิศ', 'รางวัลรองชนะเลิศ อันดับที่ 1', 'รางวัลรองชนะเลิศ อันดับที่ 2',
+    'รางวัลรองชนะเลิศ อันดับที่ 3', 'ผู้เข้าร่วมการแข่งขัน', 'ผู้ควบคุมทีม',
+    'กรรมการจัดการแข่งขัน', 'ผู้เข้าร่วมจัดการแข่งขัน'
+];
+?>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียนรับเกียรติบัตร</title>
-    <link rel="icon" type="image/png" href="img/b.png">
-    <link rel="stylesheet" href="css/backend-index.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>เพิ่มเกียรติบัตร</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5 form-container">
-        <h2 class="text-center mb-4 page-title"> ลงทะเบียนรับเกียรติบัตร</h2>
-        <form action="backend-submit.php" method="POST" class="card custom-card p-4 shadow-lg" style="max-width: 500px; margin: auto; border-radius: 15px;">
-            <div class="mb-4">
-                <label class="form-label"> ชื่อ-นามสกุล</label>
-                <input type="text" name="name" class="form-control" required placeholder="กรุณากรอกชื่อ-นามสกุล">
-            </div>
-            <div class="mb-4">
-                <label class="form-label">หัวข้อเกียรติบัตร</label>
-                <select name="detail" class="form-control" required>
-                    <option value="" disabled selected>กรุณาเลือกหัวข้อเกียรติบัตร</option>
-                    <option value="รางวัลชนะเลิศ">รางวัลชนะเลิศ</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 1">รางวัลรองชนะเลิศ อันดับที่ 1</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 2">รางวัลรองชนะเลิศ อันดับที่ 2</option>
-                    <option value="รางวัลรองชนะเลิศ อันดับที่ 3">รางวัลรองชนะเลิศ อันดับที่ 3</option>
-                    <option value="ผู้เข้าร่วมการแข่งขัน">ผู้เข้าร่วมการแข่งขัน</option>
-                    <option value="ผู้ควบคุมทีม">ผู้ควบคุมทีม</option>
-                    <option value="กรรมการจัดการแข่งขัน">กรรมการจัดการแข่งขัน</option>
-                    <option value="ผู้เข้าร่วมจัดการแข่งขัน">ผู้เข้าร่วมจัดการแข่งขัน</option>
+<div class="container mt-5">
+    <h2>เพิ่มเกียรติบัตรใหม่</h2>
+
+    <?php
+    // แสดงข้อความ feedback ถ้ามี
+    if (isset($_SESSION['feedback'])) {
+        echo '<div class="alert alert-' . $_SESSION['feedback']['type'] . '">' . $_SESSION['feedback']['message'] . '</div>';
+        // ลบข้อความ feedback ออกไปเพื่อไม่ให้แสดงซ้ำเมื่อรีเฟรช
+        unset($_SESSION['feedback']);
+    }
+    ?>
+
+    <div class="card shadow p-4">
+        <form action="backend-submit.php" method="POST">
+            <div class="mb-3">
+                <label for="member_id" class="form-label">เลือกสมาชิก</label>
+                <select name="member_id" id="member_id" class="form-select" required>
+                    <option value="">-- กรุณาเลือกสมาชิก --</option>
+                    <?php foreach ($members as $member): ?>
+                        <option value="<?= $member['member_id'] ?>">
+                            <?= htmlspecialchars($member['member_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
-            <div class="mb-4">
-                <label class="form-label"> วันที่เข้าร่วม</label>
-                <input type="date" name="datenew" class="form-control" required>
-            </div>
-            <div class="mb-4">
-                <label class="form-label">เลือกรุ่นของเกียรติบัตร</label>
-                <select name="model" class="form-control" required>
-                    <option value="model1">แบบที่ 1 ( รุ่นระดับมัธยมศึกษาหรืออาชีวศึกษา )</option>
-                    <option value="model2">แบบที่ 2 (รุ่นระดับอุดมศึกษาหรือบุคคลทั่วไป)</option>
+            
+            <div class="mb-3">
+                <label for="model" class="form-label">ประเภทรางวัล</label>
+                <select name="model" id="model" class="form-select" required>
+                     <option value="">-- กรุณาเลือกรางวัล --</option>
+                    <?php foreach ($award_models as $model): ?>
+                        <option value="<?= $model ?>"><?= $model ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary w-100 py-2 mb-2"> ลงทะเบียน</button>
+
+            <div class="mb-3">
+                <label for="detail" class="form-label">รายละเอียด (ถ้ามี)</label>
+                <input type="text" name="detail" id="detail" class="form-control" placeholder="เช่น สำหรับผลงานอันโดดเด่น">
+            </div>
+
+            <div class="mb-3">
+                <label for="date" class="form-label">วันที่ (ถ้ามี)</label>
+                <input type="date" name="date" id="date" class="form-control" value="<?= date('Y-m-d') ?>">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">สร้างเกียรติบัตร</button>
         </form>
-        <div class="text-center mt-4">
-            <a href="backend-list.php" class="btn btn-info" style="width: 250px;"> ดูรายชื่อผู้ลงทะเบียน</a>
-            <a href="../organizer_dashboard.php" class="btn btn-info" style="width: 250px;">กลับไปหน้าหลัก</a>
-        </div>
     </div>
+</div>
 </body>
 </html>

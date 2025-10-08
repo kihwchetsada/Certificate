@@ -1,64 +1,68 @@
 <?php
-// เปิดการแสดง Error ทั้งหมด เพื่อดูปัญหาที่ซ่อนอยู่
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// upload-handler.php
 
 header('Content-Type: application/json');
 
-// ฟังก์ชันสำหรับดักจับ Error สุดท้ายของ PHP
-function get_last_php_error() {
-    $error = error_get_last();
-    return $error ? $error['message'] : 'No recent error';
+$response = [
+    'success' => false,
+    'message' => 'An unknown error occurred.'
+];
+
+// 1. Basic Security Checks
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['image'])) {
+    $response['message'] = 'Invalid request.';
+    echo json_encode($response);
+    exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image']) && isset($_POST['target'])) {
-    $file = $_FILES['image'];
-    $target = $_POST['target'];
-    
-    $assetsDir = __DIR__ . '/assets';
-    $targetPath = $assetsDir . '/' . $target . '.jpg';
+if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    $response['message'] = 'File upload error. Code: ' . $_FILES['image']['error'];
+    echo json_encode($response);
+    exit();
+}
 
-    // --- ส่วน Debug เพิ่มเติม ---
-    $debug_info = [
-        'php_version' => phpversion(),
-        'script_directory' => __DIR__,
-        'target_assets_directory' => $assetsDir,
-        'final_target_path' => $targetPath,
-        'assets_dir_exists' => is_dir($assetsDir),
-        'assets_dir_is_writable' => is_writable($assetsDir),
-        'parent_dir_is_writable' => is_writable(__DIR__),
-        'is_valid_uploaded_file' => is_uploaded_file($file['tmp_name']),
-        'php_upload_error_code' => $file['error'],
-        'last_php_error_before_move' => get_last_php_error()
-    ];
+// 2. Define the single, hardcoded destination path
+$destination_path = __DIR__ . '/assets/certificate_template.jpg';
 
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        $debug_info['final_message'] = 'Upload error code was not UPLOAD_ERR_OK.';
-        echo json_encode(['success' => false, 'message' => 'PHP Upload Error Code: ' . $file['error'], 'debug' => $debug_info]);
-        exit;
-    }
+// 3. File Validation (Server-side)
+$file_tmp_path = $_FILES['image']['tmp_name'];
+$file_size = $_FILES['image']['size'];
 
-    if (!is_dir($assetsDir)) {
-        if (!mkdir($assetsDir, 0775, true)) {
-            $debug_info['final_message'] = 'Failed at mkdir() step.';
-            $debug_info['mkdir_last_error'] = get_last_php_error();
-            echo json_encode(['success' => false, 'message' => 'ไม่สามารถสร้างโฟลเดอร์ assets ได้', 'debug' => $debug_info]);
-            exit;
-        }
-    }
+if ($file_size > 2 * 1024 * 1024) { // Max 2MB
+    $response['message'] = 'File is too large. Maximum size is 2MB.';
+    echo json_encode($response);
+    exit();
+}
 
-    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        echo json_encode(['success' => true, 'message' => "อัปโหลดสำเร็จ!"]);
-    } else {
-        $debug_info['final_message'] = 'Failed at move_uploaded_file() step.';
-        $debug_info['move_uploaded_file_last_error'] = get_last_php_error();
-        echo json_encode([
-            'success' => false, 
-            'message' => 'ไม่สามารถบันทึกไฟล์ได้ (move_uploaded_file failed)', 
-            'debug' => $debug_info
-        ]);
-    }
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mime_type = finfo_file($finfo, $file_tmp_path);
+finfo_close($finfo);
+
+if ($mime_type !== 'image/jpeg') {
+    $response['message'] = 'Invalid file type. Only JPG/JPEG is allowed.';
+    echo json_encode($response);
+    exit();
+}
+
+// 4. Process the Upload
+$assets_dir = dirname($destination_path);
+if (!is_dir($assets_dir)) {
+    mkdir($assets_dir, 0775, true);
+}
+
+if (!is_writable($assets_dir)) {
+     $response['message'] = 'Error: The assets directory is not writable. Please check server permissions.';
+     echo json_encode($response);
+     exit();
+}
+
+if (move_uploaded_file($file_tmp_path, $destination_path)) {
+    $response['success'] = true;
+    $response['message'] = 'Template replaced successfully! The page will now reload.';
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method or missing files/target.']);
+    $response['message'] = 'Failed to save the uploaded file.';
 }
+
+// 5. Send the final JSON response
+echo json_encode($response);
 ?>
